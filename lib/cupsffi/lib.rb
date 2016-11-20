@@ -214,6 +214,16 @@ module CupsFFI
   attach_function 'cupsGetJobs', [:pointer, :string, :int, :int], :int
 
   # Parameters
+  #  - pointer to http connection to server or CUPS_HTTP_DEFAULT
+  #  - pointer to struct CupsJobS to populate
+  #  - printer name
+  #  - myjobs (0 == all users, 1 == mine)
+  #  - whichjobs (CUPS_WHICHJOBS_ALL, CUPS_WHICHJOBS_ACTIVE, or CUPS_WHICHJOBS_COMPLETED)
+  # Returns:
+  #  - number of jobs
+  attach_function 'cupsGetJobs2', [:pointer, :pointer, :string, :int, :int], :int
+
+  # Parameters
   #  - number of jobs
   #  - pointer to the first CupsJobS to free
   attach_function 'cupsFreeJobs', [:int, :pointer ], :void

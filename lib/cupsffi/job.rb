@@ -39,13 +39,18 @@ class CupsJob
     raise "status parameter must be a CupsPrinter or String" unless printer.nil? || [CupsPrinter, String].include?(printer.class)
     pointer = FFI::MemoryPointer.new :pointer
     p = printer || @printer
-    job_count = CupsFFI::cupsGetJobs(pointer, p.kind_of?(String) ? p : p.name, 0, CupsFFI::CUPS_WHICHJOBS_ALL)
+    job_count = if p.kind_of?(String)
+                  CupsFFI::cupsGetJobs(pointer, p, 0, CupsFFI::CUPS_WHICHJOBS_ALL)
+                else
+                  CupsFFI::cupsGetJobs2(p.connection, pointer, p.name, 0, CupsFFI::CUPS_WHICHJOBS_ALL)
+                end
 
     free_jobs = lambda do
       CupsFFI::cupsFreeJobs(job_count, pointer.get_pointer(0))
     end
 
-    job_count.times do |i|
+    # often need one of the last jobs
+    (job_count - 1).downto(0) do |i|
       job = CupsFFI::CupsJobS.new(pointer.get_pointer(0) + (CupsFFI::CupsJobS.size * i))
       if job[:id] == @id then
         state = job[:state]

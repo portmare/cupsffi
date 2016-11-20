@@ -188,7 +188,7 @@ class CupsPrinter
 
   def get_all_jobs(which = CupsFFI::CUPS_WHICHJOBS_ACTIVE)
     pointer = FFI::MemoryPointer.new :pointer
-    job_count = CupsFFI::cupsGetJobs(pointer, @name, 0, which)
+    job_count = CupsFFI::cupsGetJobs2(@connection, pointer, @name, 0, which)
 
     jobs = []
     job_count.times do |i|
